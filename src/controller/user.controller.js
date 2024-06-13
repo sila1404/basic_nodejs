@@ -2,6 +2,9 @@ import { validateData } from "../service/validate.js";
 import { v4 as uuidv4 } from "uuid";
 import conn from "../config/db_mysql.js";
 import { Role } from "../service/message.js";
+import { SendCreate, SendError400, SendError500 } from "../service/response.js";
+import CryptoJS from "crypto-js";
+import { SECRET_KEY } from "../config/config.js";
 
 export default class UserController {
   static async register(req, res) {
@@ -16,18 +19,22 @@ export default class UserController {
         password,
       });
       if (validate.length > 0) {
-        return res.status(400).json({
-          success: false,
-          message: "Please input: " + validate.join(","),
-        });
+        return SendError400(res, `Please input: ${validate.join(", ")}`);
       }
 
+      
       const uuid = uuidv4();
       const mysql =
         "INSERT INTO user (uuid, username, email, phoneNumber, password, role, createdAt, updatedAt) VALUES (? ,? ,? ,? ,? ,? ,? ,?);";
       const dateTime = new Date()
         .toISOString()
-        .replace(/T/, " ").replace(/\..+/, "");
+        .replace(/T/, " ")
+        .replace(/\..+/, "");
+
+      // Hash password before insert to table
+      const generatePassword = CryptoJS.AES.encrypt(password, SECRET_KEY).toString()
+
+      // Insert data to table
       conn.query(
         mysql,
         [
@@ -35,28 +42,21 @@ export default class UserController {
           username,
           email,
           phoneNumber,
-          password,
+          generatePassword,
           Role.user,
           dateTime,
           dateTime,
         ],
         (err, result) => {
           if (err) {
-            console.log(err)
-            return res.status(400).json("Error Register");
+            return SendError400(res, "Resgister Error", err);
           }
 
-          return res.status(201).json({
-            success: true,
-            message: "Register Success",
-          });
+          return SendCreate(res, "Register success");
         }
       );
     } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: "Internal server error",
-      });
+      return SendError500(res, "Internal Server Error", error);
     }
   }
 }

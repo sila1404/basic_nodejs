@@ -1,11 +1,18 @@
 import mysql from "mysql";
+import {
+  DATABASE_NAME,
+  DATABASE_PORT,
+  PASSWORD,
+  URL_DATABASE,
+  USERNAME,
+} from "./config.js";
 
 const conn = mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  port: process.env.MYSQL_PORT,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: "Nodejs_Course",
+  host: URL_DATABASE,
+  port: DATABASE_PORT,
+  user: USERNAME,
+  password: PASSWORD,
+  database: DATABASE_NAME,
 });
 
 conn.connect((err) => {
