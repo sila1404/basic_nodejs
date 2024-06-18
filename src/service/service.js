@@ -27,3 +27,35 @@ export const Encrypts = async (data) => {
     }
   });
 };
+
+export const GenerateToken = async (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log(data.role);
+      const payload = {
+        id: data.id,
+        role: await Encrypts(data.role),
+      };
+      console.log(payload);
+
+      const payload_refresh = {
+        id: payload.id,
+        role: payload.role,
+      };
+
+      const token = jwt.sign(payload, SCREATKEY, { expiresIn: "2h" });
+      
+      const refreshToken = jwt.sign(payload_refresh, SCREATKEY, {
+        expiresIn: "4h",
+      });
+
+      let date = new Date();
+      let expiresIn = date.setHours(2 + date.getHours());
+
+      resolve({ token, refreshToken,expiresIn });
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+};
