@@ -1,11 +1,11 @@
 import CryptoJS from "crypto-js";
-import { SCREATKEY } from "../config/config.js";
+import { SECRET_KEY } from "../config/config.js";
 import jwt from "jsonwebtoken";
 
 export const Decrypts = async (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const decoded = CryptoJS.AES.decrypt(data, SCREATKEY).toString(
+      const decoded = CryptoJS.AES.decrypt(data, SECRET_KEY).toString(
         CryptoJS.enc.Utf8
       );
       
@@ -19,7 +19,7 @@ export const Decrypts = async (data) => {
 export const Encrypts = async (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const encrypt = CryptoJS.AES.encrypt(data, SCREATKEY).toString();
+      const encrypt = CryptoJS.AES.encrypt(data, SECRET_KEY).toString();
 
       resolve(encrypt);
     } catch (error) {
@@ -43,9 +43,9 @@ export const GenerateToken = async (data) => {
         role: payload.role,
       };
 
-      const token = jwt.sign(payload, SCREATKEY, { expiresIn: "2h" });
+      const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "2h" });
       
-      const refreshToken = jwt.sign(payload_refresh, SCREATKEY, {
+      const refreshToken = jwt.sign(payload_refresh, SECRET_KEY, {
         expiresIn: "4h",
       });
 
