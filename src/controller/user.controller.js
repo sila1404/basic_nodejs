@@ -14,6 +14,19 @@ import { SECRET_KEY } from "../config/config.js";
 import { Decrypts, GenerateToken } from "../service/service.js";
 
 export default class UserController {
+  static async selectAll(req, res) {
+    try {
+      const mysql = "SELECT * FROM user";
+      conn.query(mysql, (err, result) => {
+        if (err) return SendError404(res, EMessage.NotFound);
+
+        return SendSuccess(res, SMessage.GetAll, result);
+      });
+    } catch (error) {
+      return SendError500(res, EMessage.Server);
+    }
+  }
+
   static async login(req, res) {
     try {
       const { email, password } = req.body;
