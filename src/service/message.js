@@ -9,6 +9,8 @@ export const EMessage = {
   Server: "Error Server Internal",
   NotFound: "Not Found",
   Already: "Already",
+  Unauthorized: "Unauthorized",
+  InvalideUnauthorized: "Invalid unauthorized",
   PleaseInput: "Please Input: ",
   InsertError: "Error Insert",
   UpdateError: "Error Update",
