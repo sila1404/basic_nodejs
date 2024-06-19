@@ -15,6 +15,7 @@ export const EMessage = {
   InsertError: "Error Insert",
   UpdateError: "Error Update",
   DeleteError: "Error Delete",
+  NotMatch: "Not match password"
 };
 
 // SMessage = Success Message

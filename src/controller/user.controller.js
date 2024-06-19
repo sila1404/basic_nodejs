@@ -11,7 +11,7 @@ import {
 } from "../service/response.js";
 import CryptoJS from "crypto-js";
 import { SECRET_KEY } from "../config/config.js";
-import { Decrypts, GenerateToken } from "../service/service.js";
+import { Decrypts, Encrypts, GenerateToken } from "../service/service.js";
 
 export default class UserController {
   static async selectAll(req, res) {
@@ -23,7 +23,24 @@ export default class UserController {
         return SendSuccess(res, SMessage.GetAll, result);
       });
     } catch (error) {
-      return SendError500(res, EMessage.Server);
+      return SendError500(res, EMessage.Server, error);
+    }
+  }
+
+  static async selectOne(req, res) {
+    try {
+      const uuid = req.params.uuid;
+
+      const checkedUser = "SELECT * FROM user WHERE uuid = ?";
+      conn.query(checkedUser, uuid, (err, result) => {
+        if (err) return SendError404(res, EMessage.NotFound + " user");
+
+        if (!result[0]) return SendError404(res, EMessage.NotFound + " user");
+
+        return SendSuccess(res, SMessage.GetOne, result[0]);
+      });
+    } catch (error) {
+      return SendError500(res, EMessage.Server, error);
     }
   }
 
@@ -120,6 +137,116 @@ export default class UserController {
       );
     } catch (error) {
       return SendError500(res, "Internal Server Error", error);
+    }
+  }
+
+  static async updatePassword(req, res) {
+    try {
+      const uuid = req.params.uuid;
+      const { oldPassword, newPassword } = req.body;
+
+      const validate = await validateData({ oldPassword, newPassword });
+      if (validate.length > 0) {
+        return SendError400(res, EMessage.PleaseInput + validate.join(", "));
+      }
+
+      const checkUuid = "SELECT * FROM user WHERE uuid = ?";
+      conn.query(checkUuid, uuid, async (err, result) => {
+        if (err) return SendError404(res, EMessage.NotFound + " uuid");
+
+        const decryptPassword = await Decrypts(result[0]["password"]);
+        if (oldPassword == decryptPassword) {
+          return SendError400(res, EMessage.NotMatch);
+        }
+
+        const update = "UPDATE user SET password = ? WHERE uuid = ?";
+        const generatePassword = await Encrypts(newPassword);
+        conn.query(update, [generatePassword, uuid], (err, result) => {
+          if (err) return SendError404(res, EMessage.UpdateError, err);
+
+          return SendSuccess(res, SMessage.Update);
+        });
+      });
+    } catch (error) {
+      return SendError500(res, EMessage.Server, error);
+    }
+  }
+
+  static async forgotPassword(req, res) {
+    try {
+      const { email, password } = req.body;
+
+      const validate = await validateData({ email, password });
+      if (validate.length > 0) {
+        return SendError400(res, EMessage.PleaseInput + validate.join(", "));
+      }
+
+      const checkedEmail = "SELECT * FROM user WHERE email = ?";
+      conn.query(checkedEmail, email, async (err, result) => {
+        if (err) return SendError404(res, EMessage.NotFound + " email");
+
+        const generatePassword = await Encrypts(result[0]["password"]);
+
+        const forgot = "UPDATE user SET password = ? WHERE uuid = ?";
+        conn.query(
+          forgot,
+          [generatePassword, result[0]["uuid"]],
+          (err, result) => {
+            if (err) return SendError404(res, EMessage.UpdateError, err);
+
+            return SendSuccess(res, SMessage.Update);
+          }
+        );
+      });
+    } catch (error) {
+      return SendError500(res, EMessage.Server, error);
+    }
+  }
+
+  static async updateUser(req, res) {
+    try {
+      const uuid = req.params.uuid;
+      const { username, phoneNumber } = req.body;
+
+      const validate = await validateData({ username, phoneNumber });
+      if (validate.length > 1) {
+        return SendError400(res, EMessage.PleaseInput + validate.join(", "));
+      }
+
+      const update =
+        "UPDATE user SET username = ?, phoneNumber = ?, updatedAt = ? WHERE uuid = ?";
+      const dateTime = new Date()
+        .toISOString()
+        .replace(/T/, " ")
+        .replace(/\..+/, "");
+
+      conn.query(
+        update,
+        [username, phoneNumber, dateTime, uuid],
+        (err, result) => {
+          if (err) return SendError404(res, EMessage.NotFound + " uuid");
+
+          return SendSuccess(res, SMessage.Update);
+        }
+      );
+    } catch (error) {
+      return SendError500(res, EMessage.Server, error);
+    }
+  }
+
+  static async deleteUser(req, res) {
+    try {
+      const uuid = req.params.uuid;
+
+      const deleteUser = "DELETE FROM user WHERE uuid = ?";
+      conn.query(deleteUser, uuid, (err, result) => {
+        if (err) return SendError404(res, EMessage.DeleteError);
+        if (!result[0]) return SendError404(res, EMessage.NotFound + " user");
+
+        return SendSuccess(res, SMessage.Delete);
+      });
+    } catch (error) {
+      return SendError500(res, EMessage.Server, error);
     }
   }
 }
