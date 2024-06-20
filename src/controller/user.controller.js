@@ -253,7 +253,7 @@ export default class UserController {
       }
 
       const update =
-        "UPDATE user SET username = ?, phoneNumber = ?, updatedAt = ? WHERE uuid=?";
+        "UPDATE user SET username = ?, phoneNumber = ?, updatedAt = ? WHERE uuid = ?";
       const dateTime = new Date()
         .toISOString()
         .replace(/T/, " ")
@@ -264,7 +264,6 @@ export default class UserController {
         [username, phoneNumber, dateTime, uuid],
         (err, result) => {
           if (err) return SendError404(res, EMessage.NotFound + " uuid");
-          if(!result[0]) return SendError404(res, EMessage.NotFound + " uuid");
 
           return SendSuccess(res, SMessage.Update);
         }
