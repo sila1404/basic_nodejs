@@ -11,7 +11,12 @@ import {
 } from "../service/response.js";
 import CryptoJS from "crypto-js";
 import { SECRET_KEY } from "../config/config.js";
-import { Decrypts, Encrypts, GenerateToken } from "../service/service.js";
+import {
+  Decrypts,
+  Encrypts,
+  GenerateToken,
+  VerifyToken,
+} from "../service/service.js";
 
 export default class UserController {
   static async selectAll(req, res) {
@@ -79,6 +84,39 @@ export default class UserController {
         );
 
         return SendSuccess(res, SMessage.Login, newData);
+      });
+    } catch (error) {
+      return SendError500(res, EMessage.Server, error);
+    }
+  }
+
+  static async refreshToken(req, res) {
+    try {
+      const { refreshToken } = req.body;
+      if (!refreshToken) {
+        return SendError400(res, EMessage.BadRequest + " refreshToken");
+      }
+
+      const verifyData = await VerifyToken(refreshToken);
+      if (!verifyData) {
+        return SendError404(res, EMessage.NotFound);
+      }
+
+      const checkUuid = "SELECT * FROM user WHERE uuid = ?";
+      conn.query(checkUuid, verifyData, async (err, result) => {
+        if (err) {
+          return SendError404(res, EMessage.NotFound);
+        }
+
+        const data = {
+          id: verifyData,
+          role: result[0]["role"],
+        };
+
+        const token = await GenerateToken(data);
+        if (!token) return SendError500(res, EMessage.UpdateError);
+
+        return SendSuccess(res, SMessage.Update, token);
       });
     } catch (error) {
       return SendError500(res, EMessage.Server, error);
@@ -184,8 +222,9 @@ export default class UserController {
       const checkedEmail = "SELECT * FROM user WHERE email = ?";
       conn.query(checkedEmail, email, async (err, result) => {
         if (err) return SendError404(res, EMessage.NotFound + " email");
+        if (!result[0]) return SendError404(res, EMessage.NotFound + " email");
 
-        const generatePassword = await Encrypts(result[0]["password"]);
+        const generatePassword = await Encrypts(password);
 
         const forgot = "UPDATE user SET password = ? WHERE uuid = ?";
         conn.query(
@@ -209,12 +248,12 @@ export default class UserController {
       const { username, phoneNumber } = req.body;
 
       const validate = await validateData({ username, phoneNumber });
-      if (validate.length > 1) {
+      if (validate.length > 0) {
         return SendError400(res, EMessage.PleaseInput + validate.join(", "));
       }
 
       const update =
-        "UPDATE user SET username = ?, phoneNumber = ?, updatedAt = ? WHERE uuid = ?";
+        "UPDATE user SET username = ?, phoneNumber = ?, updatedAt = ? WHERE uuid=?";
       const dateTime = new Date()
         .toISOString()
         .replace(/T/, " ")
@@ -225,6 +264,7 @@ export default class UserController {
         [username, phoneNumber, dateTime, uuid],
         (err, result) => {
           if (err) return SendError404(res, EMessage.NotFound + " uuid");
+          if(!result[0]) return SendError404(res, EMessage.NotFound + " uuid");
 
           return SendSuccess(res, SMessage.Update);
         }
@@ -238,12 +278,17 @@ export default class UserController {
     try {
       const uuid = req.params.uuid;
 
-      const deleteUser = "DELETE FROM user WHERE uuid = ?";
-      conn.query(deleteUser, uuid, (err, result) => {
-        if (err) return SendError404(res, EMessage.DeleteError);
+      const checkUuid = "SELECT * FROM user WHERE uuid = ?";
+      conn.query(checkUuid, uuid, (err, result) => {
+        if (err) return SendError404(res, EMessage.NotFound + " user");
         if (!result[0]) return SendError404(res, EMessage.NotFound + " user");
 
-        return SendSuccess(res, SMessage.Delete);
+        const deleteUser = "DELETE FROM user WHERE uuid = ?";
+        conn.query(deleteUser, uuid, (err, result) => {
+          if (err) return SendError404(res, EMessage.DeleteError);
+
+          return SendSuccess(res, SMessage.Delete);
+        });
       });
     } catch (error) {
       return SendError500(res, EMessage.Server, error);

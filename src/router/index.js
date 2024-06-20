@@ -7,8 +7,14 @@ const router = express.Router();
 // ---------- user ----------
 router.get("/user/selectAll", auth, UserController.selectAll);
 router.get("/user/selectOne/:uuid", auth, UserController.selectOne);
-router.put("/user/updateUser/:uuid", auth, UserController.updateUser);
-router.delete("/user/deleteUser/:uuid", auth, UserController.deleteUser);
+router.put("/user/update/:uuid", auth, UserController.updateUser);
+router.delete("/user/delete/:uuid", auth, UserController.deleteUser);
+
+router.put("/user/forgot", UserController.forgotPassword);
+router.put("/user/updatePassword/:uuid", auth, UserController.updatePassword);
+
+router.put("/user/refreshToken", auth, UserController.refreshToken);
+
 router.post("/user/login", UserController.login);
 router.post("/user/register", UserController.register);
 
