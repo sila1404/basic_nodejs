@@ -71,7 +71,7 @@ export const VerifyToken = async (token) => {
         conn.query(mysql, decode["id"], (err, result) => {
           if (err) reject(err);
 
-          resolve(result[0]);
+          resolve(result[0]["uuid"]);
         });
       });
     } catch (error) {
