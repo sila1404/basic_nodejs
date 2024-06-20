@@ -193,7 +193,7 @@ export default class UserController {
         if (err) return SendError404(res, EMessage.NotFound + " uuid");
 
         const decryptPassword = await Decrypts(result[0]["password"]);
-        if (oldPassword == decryptPassword) {
+        if (oldPassword !== decryptPassword) {
           return SendError400(res, EMessage.NotMatch);
         }
 
