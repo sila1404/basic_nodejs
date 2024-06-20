@@ -7,6 +7,7 @@ export const Role = {
 // EMessage = Error Message
 export const EMessage = {
   Server: "Error Server Internal",
+  BadRequest: "Bad Request",
   NotFound: "Not Found",
   Already: "Already",
   Unauthorized: "Unauthorized",
