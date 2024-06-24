@@ -7,6 +7,8 @@ const USERNAME = process.env.MYSQL_USER;
 const PASSWORD = process.env.MYSQL_PASSWORD;
 const DATABASE_PORT = process.env.MYSQL_PORT;
 const DATABASE_NAME = process.env.MYSQL_DATABASE;
+const CLOUDINARY_KEY = process.env.CLOUDINARY_KEY
+const CLOUDINARY_SECRET = process.env.CLOUDINARY_SECRET
 
 export {
   PASSWORD,
@@ -16,4 +18,6 @@ export {
   USERNAME,
   DATABASE_PORT,
   DATABASE_NAME,
+  CLOUDINARY_KEY,
+  CLOUDINARY_SECRET
 };
