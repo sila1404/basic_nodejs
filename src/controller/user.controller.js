@@ -17,6 +17,7 @@ import {
   GenerateToken,
   VerifyToken,
 } from "../service/service.js";
+import { UploadNewImageToCloud } from "../config/cloudinary.js";
 
 export default class UserController {
   static async selectAll(req, res) {
@@ -236,6 +237,39 @@ export default class UserController {
             return SendSuccess(res, SMessage.Update);
           }
         );
+      });
+    } catch (error) {
+      return SendError500(res, EMessage.Server, error);
+    }
+  }
+
+  static async updateProfile(req, res) {
+    try {
+      const uuid = req.params.uuid;
+      const image = req.files;
+      if (!image) {
+        return SendError400(res, EMessage.BadRequest + " image");
+      }
+
+      const check = "SELECT * FROM user WHERE uuid = ?";
+      conn.query(check, uuid, async (err, result) => {
+        if (err) {
+          return SendError404(res, EMessage.NotFound + " user");
+        }
+
+        const image_url = await UploadNewImageToCloud(image.profile.data);
+        if (!image_url) {
+          return SendError400(res, EMessage.UploadImageError);
+        }
+
+        const update = "UPDATE user SET profile = ? WHERE uuid = ?";
+        conn.query(update, [image_url, uuid], (err, result) => {
+          if (err) {
+            return SendError400(res, EMessage.UpdateError, err);
+          }
+
+          return SendSuccess(res, SMessage.Update);
+        });
       });
     } catch (error) {
       return SendError500(res, EMessage.Server, error);

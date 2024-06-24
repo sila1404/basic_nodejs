@@ -12,6 +12,7 @@ router.delete("/user/delete/:uuid", auth, UserController.deleteUser);
 
 router.put("/user/forgot", UserController.forgotPassword);
 router.put("/user/updatePassword/:uuid", auth, UserController.updatePassword);
+router.put("/user/updateProfile/:uuid", auth, UserController.updateProfile);
 
 router.put("/user/refreshToken", auth, UserController.refreshToken);
 
