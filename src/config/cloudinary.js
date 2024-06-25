@@ -9,8 +9,14 @@ cloudinary.v2.config({
   secure: true,
 });
 
-const UploadNewImageToCloud = async (file) => {
+const UploadImageToCloud = async (file, oldImage) => {
   try {
+    if (!oldImage) {
+      const splitUrl = file.toString().split("/");
+      const image_id = splitUrl[splitUrl.length - 1].split(".")[0];
+      await cloudinary.v2.uploader.destroy(image_id);
+    }
+
     const base64 = file.toString("base64");
     const imagePath = "data:image/png;base64," + base64;
     const url = await cloudinary.v2.uploader.upload(imagePath, {
@@ -25,17 +31,4 @@ const UploadNewImageToCloud = async (file) => {
   }
 };
 
-const UploadOldImageToCloud = async (file) => {
-  try {
-    const splitUrl = file.split("/");
-    const image_id = splitUrl[splitUrl.length - 1].split(".")[0];
-    const url = await cloudinary.v2.uploader.destroy(image_id);
-
-    return url;
-  } catch (error) {
-    console.log(error);
-    return "";
-  }
-};
-
-export { UploadNewImageToCloud, UploadOldImageToCloud };
+export default UploadImageToCloud;
