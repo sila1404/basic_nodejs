@@ -17,7 +17,9 @@ import {
   GenerateToken,
   VerifyToken,
 } from "../service/service.js";
-import { UploadNewImageToCloud } from "../config/cloudinary.js";
+
+import UploadImageToCloud from "../config/cloudinary.js";
+import UploadImageToServer from "../service/uploadImageToServer.js";
 
 export default class UserController {
   static async selectAll(req, res) {
@@ -257,7 +259,8 @@ export default class UserController {
           return SendError404(res, EMessage.NotFound + " user");
         }
 
-        const image_url = await UploadNewImageToCloud(image.profile.data);
+        // const image_url = await UploadImageToCloud(image.profile.data);
+        const image_url = await UploadImageToServer(image.profile.data)
         if (!image_url) {
           return SendError400(res, EMessage.UploadImageError);
         }
