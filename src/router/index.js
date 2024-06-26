@@ -1,6 +1,7 @@
 import express from "express";
 import UserController from "../controller/user.controller.js";
 import { auth } from "../middleware/auth.middleware.js";
+import CategoryController from "../controller/category.controller.js";
 
 const router = express.Router();
 
@@ -18,5 +19,13 @@ router.put("/user/refreshToken", auth, UserController.refreshToken);
 
 router.post("/user/login", UserController.login);
 router.post("/user/register", UserController.register);
+
+
+// ---------- category ----------
+router.get("/category/selectAll", auth, CategoryController.selectAll);
+router.get("/category/selectOne/:cUuid", auth, CategoryController.selectOne);
+router.post("/category/insert", auth, CategoryController.insert);
+router.put("/category/update/:cUuid", auth, CategoryController.updateCategory);
+router.delete("/category/delete/:cUuid", auth, CategoryController.deleteCategory);
 
 export default router;
