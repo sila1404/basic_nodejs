@@ -31,6 +31,9 @@ export default class CategoryController {
       const check = "SELECT * FROM category WHERE cUuid = ?";
       conn.query(check, cUuid, (err, result) => {
         if (err) {
+          return SendError404(res, EMessage.NotFound + " category", err);
+        }
+        if(!result[0]) {
           return SendError404(res, EMessage.NotFound + " category");
         }
 
@@ -82,6 +85,9 @@ export default class CategoryController {
         if (err) {
           return SendError404(res, EMessage.NotFound + " category");
         }
+        if(!result[0]) {
+          return SendError404(res, EMessage.NotFound + " category");
+        }
 
         const update =
           "UPDATE category SET title = ?, updatedAt = ? WHERE cUuid = ?";
@@ -109,6 +115,9 @@ export default class CategoryController {
       const check = "SELECT * FROM category WHERE cUuid = ?";
       conn.query(check, cUuid, (err, result) => {
         if (err) {
+          return SendError404(res, EMessage.NotFound + " category");
+        }
+        if(!result[0]) {
           return SendError404(res, EMessage.NotFound + " category");
         }
 
