@@ -95,7 +95,7 @@ export default class ProductController {
             amount,
             price,
             image_url,
-            result[0]["cUuid"],
+            category_id,
             dateTime,
             dateTime,
           ],
