@@ -1,5 +1,5 @@
-import UploadImageToCloud from "../config/cloudinary";
-import conn from "../config/db_mysql";
+import UploadImageToCloud from "../config/cloudinary.js";
+import conn from "../config/db_mysql.js";
 import { EMessage, SMessage } from "../service/message.js";
 import {
   SendCreate,
