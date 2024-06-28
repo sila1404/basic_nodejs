@@ -197,7 +197,7 @@ export default class ProductController {
     }
   }
 
-  static async deleteCategory(req, res) {
+  static async deleteProduct(req, res) {
     try {
       const pUuid = req.params.cUuid;
       const check = "SELECT * FROM product WHERE pUuid = ?";
