@@ -14,7 +14,9 @@ import { validateData } from "../service/validate.js";
 export default class ProductController {
   static async selectAll(req, res) {
     try {
-      const mysql = "SELECT * FROM product";
+      const mysql = `SELECT product.pID, product.pUuid, product.name, product.detail, product.amount, product.price, product.image, category.title, product.createdAt, product.updatedAt
+        FROM product 
+        INNER JOIN category ON product.category_id = category.cUuid`;
       conn.query(mysql, (err, result) => {
         if (err) {
           return SendError404(res, EMessage.NotFound + " product");
@@ -30,7 +32,9 @@ export default class ProductController {
   static async selectOne(req, res) {
     try {
       const pUuid = req.params.pUuid;
-      const checkProduct = "SELECT * FROM product WHERE pUuid = ?";
+      const checkProduct = `SELECT product.pID, product.pUuid, product.name, product.detail, product.amount, product.price, product.image, category.title, product.createdAt, product.updatedAt
+        FROM product 
+        INNER JOIN category ON product.category_id = category.cUuid WHERE pUuid=?`;
       conn.query(checkProduct, pUuid, (err, result) => {
         if (err) {
           return SendError404(res, EMessage.NotFound + " product", err);
@@ -147,14 +151,14 @@ export default class ProductController {
           checkCategory,
           category_id,
           async (errCategory, categoryData) => {
-            if (err) {
+            if (errCategory) {
               return SendError404(
                 res,
                 EMessage.NotFound + " category",
                 errCategory
               );
             }
-            if (!categoryData[0]) {
+            if (!categoryData) {
               return SendError404(res, EMessage.NotFound + " category");
             }
 
@@ -164,7 +168,7 @@ export default class ProductController {
             }
 
             const update =
-              "UPDATE product SET name = ?, detail = ?, amount = ?, price = ?, image = ?, category_id , updatedAt = ? WHERE pUuid = ?";
+              "UPDATE product SET name = ?, detail = ?, amount = ?, price = ?, image = ?, category_id = ?, updatedAt = ? WHERE pUuid = ?";
             const dateTime = new Date()
               .toISOString()
               .replace(/T/, " ")
@@ -183,7 +187,7 @@ export default class ProductController {
               ],
               (errUpdate) => {
                 if (errUpdate) {
-                  return SendError400(res, EMessage.UpdateError, err);
+                  return SendError400(res, EMessage.UpdateError, errUpdate);
                 }
 
                 return SendSuccess(res, SMessage.Update);
@@ -199,7 +203,7 @@ export default class ProductController {
 
   static async deleteProduct(req, res) {
     try {
-      const pUuid = req.params.cUuid;
+      const pUuid = req.params.pUuid;
       const check = "SELECT * FROM product WHERE pUuid = ?";
       conn.query(check, pUuid, (err, result) => {
         if (err) {
@@ -208,11 +212,10 @@ export default class ProductController {
         if (!result[0]) {
           return SendError404(res, EMessage.NotFound + " product");
         }
-
-        const deleteCategory = "DELETE FROM product WHERE pUuid = ?";
-        conn.query(deleteCategory, result[0]["pUuid"], (err, result) => {
+        const deleteProduct = "DELETE FROM product WHERE pUuid = ?";
+        conn.query(deleteProduct, pUuid, (err) => {
           if (err) {
-            return SendError400(res, EMessage.DeleteError);
+            return SendError400(res, EMessage.DeleteError, err);
           }
 
           return SendSuccess(res, SMessage.Delete);
