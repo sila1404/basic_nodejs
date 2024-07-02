@@ -3,6 +3,7 @@ import UserController from "../controller/user.controller.js";
 import { auth } from "../middleware/auth.middleware.js";
 import CategoryController from "../controller/category.controller.js";
 import ProductController from "../controller/product.controller.js";
+import BannerController from "../controller/banner.controller.js";
 
 const router = express.Router();
 
@@ -30,11 +31,18 @@ router.put("/category/update/:cUuid", auth, CategoryController.updateCategory);
 router.delete("/category/delete/:cUuid", auth, CategoryController.deleteCategory);
 
 
-// ---------- category ----------
+// ---------- product ----------
 router.get("/product/selectAll", auth, ProductController.selectAll);
 router.get("/product/selectOne/:pUuid", auth, ProductController.selectOne);
 router.post("/product/insert", auth, ProductController.insert);
 router.put("/product/update/:pUuid", auth, ProductController.updateProduct);
 router.delete("/product/delete/:pUuid", auth, ProductController.deleteProduct);
+
+// ---------- banner ----------
+router.get("/banner/selectAll", auth, BannerController.selectAll);
+router.get("/banner/selectOne/:bUuid", auth, BannerController.selectOne);
+router.post("/banner/insert", auth, BannerController.insert);
+router.put("/banner/update/:bUuid", auth, BannerController.updateBanner);
+router.delete("/banner/delete/:bUuid", auth, BannerController.deleteBanner);
 
 export default router;
