@@ -4,6 +4,12 @@ export const Role = {
   owner: "owner",
 };
 
+export const StatusOrder = {
+  pending: "pending",
+  success: "success",
+  cancel: "cancel",
+};
+
 // EMessage = Error Message
 export const EMessage = {
   Server: "Error Server Internal",
