@@ -17,6 +17,9 @@ export default class OrderController {
       const select = "SELECT * FROM orders";
       conn.query(select, (err, result) => {
         if (err) {
+          return SendError404(res, EMessage.NotFound, err);
+        }
+        if (!result[0]) {
           return SendError404(res, EMessage.NotFound);
         }
 
