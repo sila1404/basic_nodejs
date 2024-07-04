@@ -105,8 +105,8 @@ export default class OrderController {
         return SendError400(res, EMessage.BadRequest + " status");
       }
 
-      const check = Object.assign(StatusOrder);
-      if (!check.include(status)) {
+      const check = Object.values(StatusOrder);
+      if (!check.includes(status)) {
         return SendError400(res, EMessage.BadRequest + " status not match");
       }
 
@@ -127,10 +127,10 @@ export default class OrderController {
           .replace(/\..+/, "");
         conn.query(update, [status, dateTime, oUuid], (err, result) => {
           if (err) {
-            return SendError400(res, EMessage.InsertError, err);
+            return SendError400(res, EMessage.UpdateError, err);
           }
 
-          return SendSuccess(res, SMessage.Insert);
+          return SendSuccess(res, SMessage.Update);
         });
       });
     } catch (error) {
