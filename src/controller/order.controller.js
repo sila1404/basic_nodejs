@@ -116,8 +116,13 @@ export default class OrderController {
           return SendError404(res, EMessage.NotFound + " orders");
         }
 
-        const update = "UPDATE orders SET status = ? WHERE oUuid = ?";
-        conn.query(update, [status, oUuid], (err, result) => {
+        const update =
+          "UPDATE orders SET status = ?, updatedAt = ? WHERE oUuid = ?";
+        const dateTime = new Date()
+          .toISOString()
+          .replace(/T/, " ")
+          .replace(/\..+/, "");
+        conn.query(update, [status, dateTime, oUuid], (err, result) => {
           if (err) {
             return SendError400(res, EMessage.InsertError, err);
           }
