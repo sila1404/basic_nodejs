@@ -17,7 +17,7 @@ export const EMessage = {
   NotFound: "Not Found",
   Already: "Already",
   Unauthorized: "Unauthorized",
-  InvalideUnauthorized: "Invalid unauthorized",
+  InvalidUnauthorized: "Invalid Unauthorized",
   PleaseInput: "Please Input: ",
   InsertError: "Error Insert",
   UpdateError: "Error Update",
@@ -28,8 +28,10 @@ export const EMessage = {
 
 // SMessage = Success Message
 export const SMessage = {
+  Search: "Search Success",  
   GetOne: "Get One Success",
   GetAll: "Get All Success",
+  SelectBy: "Select By Success",
   Login: "Login Success",
   Register: "Register Success",
   Insert: "Insert Success",
