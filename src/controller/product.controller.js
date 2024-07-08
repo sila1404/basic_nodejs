@@ -12,6 +12,29 @@ import { v4 as uuidv4 } from "uuid";
 import { validateData } from "../service/validate.js";
 
 export default class ProductController {
+  static async searchProduct(req, res) {
+    try {
+      const search = req.query.search;
+      if (!search) {
+        return SendError400(res, EMessage.BadRequest + " search");
+      }
+
+      const check = `SELECT * FROM product WHERE name LIKE '%${search}%'`;
+      conn.query(check, (err, result) => {
+        if (err) {
+          return SendError404(res, EMessage.NotFound + " search", err);
+        }
+        if (!result[0]) {
+          return SendError404(res, EMessage.NotFound + " search");
+        }
+
+        return SendSuccess(res, SMessage.Search, result);
+      });
+    } catch (error) {
+      return SendError500(res, EMessage.Server, error);
+    }
+  }
+
   static async selectAll(req, res) {
     try {
       const mysql = `SELECT product.pID, product.pUuid, product.name, product.detail, product.amount, product.price, product.image, category.title, product.createdAt, product.updatedAt

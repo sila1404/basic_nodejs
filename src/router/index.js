@@ -34,6 +34,7 @@ router.delete("/category/delete/:cUuid", auth, CategoryController.deleteCategory
 
 
 // ---------- product ----------
+router.get("/product/search",auth , ProductController.searchProduct);
 router.get("/product/selectAll", auth, ProductController.selectAll);
 router.get("/product/selectOne/:pUuid", auth, ProductController.selectOne);
 router.post("/product/insert", auth, ProductController.insert);
