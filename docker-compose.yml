@@ -1,0 +1,16 @@
+version: '1'
+services:
+  web:
+    build: .
+    command: npm start
+    ports:
+      - "3000:3000"
+    environment:
+      - MYSQL_HOST=mysql-177962-0.cloudclusters.net
+      - MYSQL_PORT=10118
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=0aCzmkJX
+      - MYSQL_DATABASE=Nodejs_Course
+      - CRYPTO_SECRET_KEY=Nodejs10
+      - CLOUDINARY_KEY=854557291533692
+      - CLOUDINARY_SECRET=oGkSdQiP0wWKk094LXUc2CUTz_U
